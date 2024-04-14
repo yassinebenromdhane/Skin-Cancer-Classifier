@@ -1,6 +1,6 @@
 # Skin Cancer Lesion Classification using HAM10000 Dataset
 
-This is a Skin Cancer Lesion Classification project.In this repository, I tackle the task of classifying dermatoscopic images into different categories of skin cancer lesions using the HAM10000 dataset. Skin cancer is a significant health concern, and early detection through image analysis can be a powerful tool in aiding diagnosis.
+This is a Skin Cancer  Classification project.In this repository, Skin cancer is a significant health concern, and early detection through image analysis can be a powerful tool in aiding diagnosis.
 
 ## Dataset Link
 
