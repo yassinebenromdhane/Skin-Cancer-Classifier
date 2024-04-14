@@ -1,0 +1,21 @@
+# Core libraries
+numpy
+pandas
+scikit-learn
+matplotlib
+seaborn
+scipy
+
+
+# Deep learning frameworks
+tensorflow-cpu
+torch
+keras
+autokeras
+
+# Additional libraries
+jupyter
+scipy
+pillow
+joblib
+Flask
