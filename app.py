@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, flash
 from werkzeug.utils import secure_filename
 from main import getPrediction
 import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 #Save images to the 'static' folder as Flask serves images from this directory
 UPLOAD_FOLDER = 'static/images/'
@@ -53,4 +54,4 @@ def submit_file():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')

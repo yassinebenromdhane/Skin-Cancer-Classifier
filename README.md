@@ -48,7 +48,7 @@ The [HAM10000 dataset Kaggle](https://www.kaggle.com/kmader/skin-cancer-mnist-ha
 4. **Replace the path of the model in main.py**
 ```python
     #Load model
-    my_model=load_model("/home/yassine/Desktop/Study/Deep Learning/Classification-of-Dermatoscopic-Images/models/model.h5")
+    my_model=load_model("/app/models/model.h5")
 ```
 
 
