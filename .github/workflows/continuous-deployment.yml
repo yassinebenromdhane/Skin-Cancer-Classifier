@@ -36,8 +36,9 @@ jobs:
       id: get_commit_message
       run: echo "::set-output name=version::$(git log -1 --pretty=%B)"
 
-    - name: Set up new version in deployment.yaml
-      run: sed -i "s|image: gcr.io/deep-learning-421017/skin-cancer-prediction:v1|image: gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.get_commit_message.outputs.version }}|g" kubernetes/deployment.yaml
+    # - name: Set up new version in deployment.yaml
+    #   run: sed -i "s|image: gcr.io/deep-learning-421017/skin-cancer-prediction:v1|image: gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.get_commit_message.outputs.version }}|g" kubernetes/deployment.yaml
+
     
     - name: Build and push Docker image
       run: |
