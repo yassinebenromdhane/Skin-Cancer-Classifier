@@ -5,8 +5,19 @@ on:
       - master
 jobs:
   build:
-    runs-on: ubuntu:18.04
+    runs-on: ubuntu:latest
     steps:
+    - name: Free Disk Space (Ubuntu)
+      uses: jlumbroso/free-disk-space@main
+      with:
+        tool-cache: false  
+        android: true
+        dotnet: true
+        haskell: true
+        large-packages: true
+        docker-images: true
+        swap-storage: true
+      
     - name: Checkout repository
       uses: actions/checkout@v2
     - name: Set up Python 3.10.14
