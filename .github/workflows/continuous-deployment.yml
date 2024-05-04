@@ -48,8 +48,8 @@ jobs:
     
     - name: Build and push Docker image
       run: |
-        docker build -t gcr.io/deep-learning-421017/skin-cancer-prediction:v2 .
-        docker push gcr.io/deep-learning-421017/skin-cancer-prediction:v2
+        docker build -t gcr.io/deep-learning-421017/skin-cancer-prediction:v3 .
+        docker push gcr.io/deep-learning-421017/skin-cancer-prediction:v3
       
     - name: Deploy to Kubernetes
       run: |
