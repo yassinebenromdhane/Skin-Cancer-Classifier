@@ -33,17 +33,18 @@ jobs:
         id: extract_tag
         run: |
           commit_message=$(git log -1 --pretty=%B)
-          # Customizable pattern to extract the tag from the commit message
-          # Replace 'release-\d+\.\d+\.\d+' with a regular expression that matches your
-          # specific format. For example:
-          #   - 'hotfix-\w+' (for hotfix tags)
-          #   - 'feature-\w+' (for feature tags)
-          tag=$(echo "$commit_message" | grep -Eo 'release-\d+\.\d+\.\d+')
+          tag=$(echo "$commit_message" | grep -Eo 'image_tag:\K \w+')
           if [[ -z "$tag" ]]; then
             echo "Warning: No matching tag found in commit message. Using default tag 'latest'."
             tag="latest"
           fi
           echo "::set-output name=tag::$tag"
+
+      - name: Modify deployment.yaml with new image tag
+        run: |
+          old_tag=$(grep -oP 'image: gcr.io/deep-learning-421017/skin-cancer-prediction:\K\w+' kubernetes/deployment.yaml)
+          new_tag="${{ steps.extract_tag.outputs.tag }}"
+          sed -i "s|image: gcr.io/deep-learning-421017/skin-cancer-prediction:${old_tag}|image: gcr.io/deep-learning-421017/skin-cancer-prediction:${new_tag}|g" kubernetes/deployment.yaml
 
       - name: Build Docker image with dynamic tag
         run: |
@@ -51,9 +52,6 @@ jobs:
 
       - name: Push Docker image
         run: docker push "gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.extract_tag.outputs.tag }}"
-
-      - name: Set up new version in deployment.yaml (configurable)
-        run: sed -i "s|image: gcr.io/deep-learning-421017/skin-cancer-prediction:v[0-9.]*|image: gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.extract_tag.outputs.tag }}|g" kubernetes/deployment.yaml
 
       - name: Deploy to Kubernetes
         run: |
