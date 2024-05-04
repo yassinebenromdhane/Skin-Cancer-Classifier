@@ -1,5 +1,5 @@
-# Use the official Python 3.10 image as the base image
-FROM python:3.10
+# Stage 1: Build the application
+FROM python:3.10 as build
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -10,8 +10,14 @@ COPY requirements.txt .
 # Install the Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the project files to the working directory
-COPY . .
+# Stage 2: Run the application
+FROM python:3.10-slim as runtime
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Python dependencies from the build stage
+COPY --from=build /app /app
 
 # Expose the port the app runs on
 EXPOSE 5000

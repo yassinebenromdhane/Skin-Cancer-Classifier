@@ -6,7 +6,7 @@ from google.cloud import storage
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 # Configure Google Cloud Storage
-storage_client = storage.Client()
+storage_client = storage.Client.from_service_account_json('google-auth-credentials.json')
 bucket_name = 'deep-learning-uploads'
 bucket = storage_client.bucket(bucket_name)
 

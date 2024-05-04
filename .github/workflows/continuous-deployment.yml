@@ -1,54 +1,68 @@
-name : Continuous Integration/Deployment to Kubernetes on GCP using GitHub Actions
+name: Continuous Integration/Deployment to Kubernetes on GCP using GitHub Actions
 on:
   push:
     branches:
       - master
+
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
-    steps:      
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    - name: Set up Python 3.10.14
-      uses: actions/setup-python@v1
-      with:
-        python-version: 3.10.14
-    
-    - name: Set up Google Cloud SDK
-      uses: google-github-actions/setup-gcloud@v0.2.0
-      with:
-        project_id: ${{ secrets.GCP_PROJECT_ID }}
-        service_account_key: ${{ secrets.GCP_SA_KEY }}
-        export_default_credentials: true
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Install gke-gcloud-auth-plugin
-      run: gcloud components install gke-gcloud-auth-plugin
+      - name: Set up Python 3.10.14 (if needed for your project)
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.10.14  # Adjust based on your requirements
 
-    - name: Authenticate Docker to Google Container Registry
-      run: gcloud auth configure-docker gcr.io
-    
-    - name: Get docker image build dynamic from commit message
-      id: get_commit_message
-      run: echo "::set-output name=version::$(git log -1 --pretty=%B)"
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0.2.0
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
 
-    # - name: Set up new version in deployment.yaml
-    #   run: sed -i "s|image: gcr.io/deep-learning-421017/skin-cancer-prediction:v1|image: gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.get_commit_message.outputs.version }}|g" kubernetes/deployment.yaml
+      - name: Install gke-gcloud-auth-plugin
+        run: gcloud components install gke-gcloud-auth-plugin
 
-    
-    - name: Build and push Docker image
-      run: |
-        docker build -t gcr.io/deep-learning-421017/skin-cancer-prediction:v4 .
-        docker push gcr.io/deep-learning-421017/skin-cancer-prediction:v4
-      
-    - name: Deploy to Kubernetes
-      run: |
-        gcloud container clusters get-credentials skin-cancer-prediction-cluster --zone europe-west1-b --project deep-learning-421017
-        kubectl apply -f kubernetes/deployment.yaml
-    
-    - name: Check deployment status
-      run: kubectl rollout status deployment/skin-cancer-prediction
-    
+      - name: Authenticate Docker to Google Container Registry
+        run: gcloud auth configure-docker gcr.io
 
+      - name: Extract dynamic image tag from commit message (configurable)
+        id: extract_tag
+        run: |
+          commit_message=$(git log -1 --pretty=%B)
+          # Customizable pattern to extract the tag from the commit message
+          # Replace 'release-\d+\.\d+\.\d+' with a regular expression that matches your
+          # specific format. For example:
+          #   - 'hotfix-\w+' (for hotfix tags)
+          #   - 'feature-\w+' (for feature tags)
+          tag=$(echo "$commit_message" | grep -Eo 'release-\d+\.\d+\.\d+')
+          if [[ -z "$tag" ]]; then
+            echo "Warning: No matching tag found in commit message. Using default tag 'latest'."
+            tag="latest"
+          fi
+          echo "::set-output name=tag::$tag"
 
+      - name: Build Docker image with dynamic tag
+        run: |
+          docker build -t "gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.extract_tag.outputs.tag }}" .
 
-    
+      - name: Push Docker image
+        run: docker push "gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.extract_tag.outputs.tag }}"
+
+      - name: Generate deployment file with dynamic image tag
+        uses: JamesRandall/jx-action@v1.4.3
+        with:
+          template: kubernetes/deployment.yaml.j2
+          output: kubernetes/deployment.yaml
+          jx3-variable: image_tag=${{ steps.extract_tag.outputs.tag }}
+
+      - name: Deploy to Kubernetes
+        run: |
+          gcloud container clusters get-credentials skin-cancer-prediction-cluster --zone europe-west1-b --project deep-learning-421017
+          kubectl apply -f kubernetes/deployment.yaml
+
+      - name: Check deployment status
+        run: kubectl rollout status deployment/skin-cancer-prediction
