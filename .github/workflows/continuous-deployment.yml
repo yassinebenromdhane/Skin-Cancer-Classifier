@@ -52,7 +52,7 @@ jobs:
       - name: Push Docker image
         run: docker push "gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.extract_tag.outputs.tag }}"
 
-      - name: Set up new version in deployment.yaml
+      - name: Set up new version in deployment.yaml (configurable)
         run: sed -i "s|image: gcr.io/deep-learning-421017/skin-cancer-prediction:v[0-9.]*|image: gcr.io/deep-learning-421017/skin-cancer-prediction:${{ steps.extract_tag.outputs.tag }}|g" kubernetes/deployment.yaml
 
       - name: Deploy to Kubernetes
