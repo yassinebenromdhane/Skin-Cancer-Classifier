@@ -2,7 +2,14 @@ from flask import Flask, render_template, request, redirect, flash
 from werkzeug.utils import secure_filename
 from main import getPrediction
 import os
+from google.cloud import storage
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
+
+# Configure Google Cloud Storage
+storage_client = storage.Client()
+bucket_name = 'deep-learning-uploads'
+bucket = storage_client.bucket(bucket_name)
+
 
 #Save images to the 'static' folder as Flask serves images from this directory
 UPLOAD_FOLDER = 'static/images/'
@@ -43,13 +50,18 @@ def submit_file():
             flash('No file selected for uploading')
             return redirect(request.url)
         if file:
-            filename = secure_filename(file.filename)  #Use this werkzeug method to secure filename. 
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            label = getPrediction(filename)
+            # filename = secure_filename(file.filename)  #Use this werkzeug method to secure filename. 
+            # file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+            # label = getPrediction(filename)
+            filename = secure_filename(file.filename)
+            
+            # Upload the file to the Cloud Storage bucket
+            blob = bucket.blob(filename)
+            blob.upload_from_string(file.read(), content_type=file.content_type)
             flash(label)
             print(label)
-            full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            flash(full_filename)
+            # full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            # flash(full_filename)
             return redirect('/')
 
 

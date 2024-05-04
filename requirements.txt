@@ -19,3 +19,4 @@ scipy
 pillow
 joblib
 Flask
+google-cloud-storage
