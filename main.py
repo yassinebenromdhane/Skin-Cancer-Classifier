@@ -15,7 +15,7 @@ def getPrediction(filename):
     
     
     #Load model
-    my_model=load_model("/app/models/model.h5")
+    my_model=load_model("https://storage.cloud.google.com/skin-cancer-prediction-model/model.h5")
     
     SIZE = 32 #Resize to same size as training images
     img_path = '/app/static/images/'+filename
