@@ -25,7 +25,7 @@
         <div class="container">
             <div class="row justify-content-center">
                 <div class="col-md-8 text-center">
-                    <h1 class="display-4 text-primary">Skin Cancer Classifier</h1>
+                    <h1 class="display-4 text-primary">Skin Cancer Lesion Classifier</h1>
                     <p class="lead">Upload an image and click submit</p>
                 </div>
             </div>
@@ -43,22 +43,22 @@
                 <div class="col-md-8 text-center">
                     <div class="diagnosis">
                         {% with messages = get_flashed_messages() %}
-                            {% if messages %}
-                                <p class="lead">Diagnosis for the following image is: <strong>{{ messages[0] }}</strong></p>
-                                <img src="{{ messages[1] }}" class="img-fluid rounded" alt="Diagnosed Image">
-                            {% endif %}
+                        {% if messages %}
+                        <p class="lead">Diagnosis for the following image is: <strong>{{ messages[0] }}</strong></p>
+                        <img src="{{ messages[1] }}" class="img-fluid rounded" alt="Diagnosed Image">
+                        {% endif %}
                         {% endwith %}
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    
+
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    
-    </body>
+
+</body>
 
 </html>
