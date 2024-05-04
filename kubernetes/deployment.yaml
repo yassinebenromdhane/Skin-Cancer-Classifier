@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: skin-cancer-prediction
-        image: gcr.io/deep-learning-421017/skin-cancer-prediction:v4
+        image: gcr.io/deep-learning-421017/skin-cancer-prediction:v5
         imagePullPolicy: IfNotPresent
         ports:
         - containerPort: 5000
