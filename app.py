@@ -2,14 +2,7 @@ from flask import Flask, render_template, request, redirect, flash
 from werkzeug.utils import secure_filename
 from main import getPrediction
 import os
-from google.cloud import storage
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
-# Configure Google Cloud Storage
-storage_client = storage.Client.from_service_account_json('google-auth-credentials.json')
-bucket_name = 'deep-learning-uploads'
-bucket = storage_client.bucket(bucket_name)
-
 
 #Save images to the 'static' folder as Flask serves images from this directory
 UPLOAD_FOLDER = 'static/images/'
@@ -17,23 +10,13 @@ UPLOAD_FOLDER = 'static/images/'
 #Create an app object using the Flask class. 
 app = Flask(__name__, static_folder="static")
 
-#Add reference fingerprint. 
-#Cookies travel with a signature that they claim to be legit. 
-#Legitimacy here means that the signature was issued by the owner of the cookie.
-#Others cannot change this cookie as it needs the secret key. 
-#It's used as the key to encrypt the session - which can be stored in a cookie.
-#Cookies should be encrypted if they contain potentially sensitive information.
+
 app.secret_key = "kunal"
 
 #Define the upload folder to save images uploaded by the user. 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['TEMPLATES_FOLDER'] = 'templates/'
 
-#Define the route to be home. 
-#The decorator below links the relative route of the URL to the function it is decorating.
-#Here, index function is with '/', our root directory. 
-#Running the app sends us to index.html.
-#Note that render_template means it looks for the file in the templates folder. 
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -50,25 +33,13 @@ def submit_file():
             flash('No file selected for uploading')
             return redirect(request.url)
         if file:
-            # filename = secure_filename(file.filename)  #Use this werkzeug method to secure filename. 
-            # file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
-            # label = getPrediction(filename)
-            filename = secure_filename(file.filename)
-            
-           # Upload the file to the Cloud Storage bucket
-            image_bucket_name = 'deep-learning-uploads'
-            image_blob_name = filename
-            image_blob = storage_client.bucket(image_bucket_name).blob(image_blob_name)
-            image_blob.upload_from_file(file)
-            
-            # Call getPrediction function with appropriate parameters
-            model_bucket_name = 'skin-cancer-prediction-model'
-            model_filename = 'model.h5' 
-            prediction = getPrediction(image_bucket_name, image_blob_name, model_bucket_name, model_filename)
+            filename = secure_filename(file.filename)  #Use this werkzeug method to secure filename. 
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'],filename))
+            label = getPrediction(filename)
             flash(label)
             print(label)
-            # full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            # flash(full_filename)
+            full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            flash(full_filename)
             return redirect('/')
 
 
