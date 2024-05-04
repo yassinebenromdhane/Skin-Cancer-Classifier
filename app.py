@@ -55,9 +55,16 @@ def submit_file():
             # label = getPrediction(filename)
             filename = secure_filename(file.filename)
             
-            # Upload the file to the Cloud Storage bucket
-            blob = bucket.blob(filename)
-            blob.upload_from_string(file.read(), content_type=file.content_type)
+           # Upload the file to the Cloud Storage bucket
+            image_bucket_name = 'deep-learning-uploads'
+            image_blob_name = filename
+            image_blob = storage_client.bucket(image_bucket_name).blob(image_blob_name)
+            image_blob.upload_from_file(file)
+            
+            # Call getPrediction function with appropriate parameters
+            model_bucket_name = 'skin-cancer-prediction-model'
+            model_filename = 'model.h5' 
+            prediction = getPrediction(image_bucket_name, image_blob_name, model_bucket_name, model_filename)
             flash(label)
             print(label)
             # full_filename = os.path.join(app.config['UPLOAD_FOLDER'], filename)
