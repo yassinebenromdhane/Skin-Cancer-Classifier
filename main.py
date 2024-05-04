@@ -15,10 +15,10 @@ def getPrediction(filename):
     
     
     #Load model
-    my_model=load_model("/app/models/model.h5")
+    my_model=load_model("models/model.h5")
     
     SIZE = 32 #Resize to same size as training images
-    img_path = '/app/static/images/'+filename
+    img_path = 'static/images/'+filename
     img = np.asarray(Image.open(img_path).resize((SIZE,SIZE)))
     
     img = img/255.      #Scale pixel values

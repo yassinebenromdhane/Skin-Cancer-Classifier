@@ -5,7 +5,7 @@ import os
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 #Save images to the 'static' folder as Flask serves images from this directory
-UPLOAD_FOLDER = '/app/static/images/'
+UPLOAD_FOLDER = 'static/images/'
 
 #Create an app object using the Flask class. 
 app = Flask(__name__, static_folder="static")
